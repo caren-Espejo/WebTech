@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session-LongQuiz1</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg,white, #2575fc);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #login-page, #protected-page {
+            background: #fff;
+            color: #333;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        input {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            width: 90%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px;
+            width: 95%;
+            margin: 10px auto;
+            border: none;
+            border-radius: 5px;
+            background: #007BFF;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+        .messages {
+            margin: 20px 0;
+            padding: 10px;
+            background: #f9f9f9;
+            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #logout-btn {
+            background: #d9534f;
+        }
+        #logout-btn:hover {
+            background: #c9302c;
+        }
+        #error {
+            color: #d9534f;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="login-page">
+        <h2>Login</h2>
+        <h3> username -  webtech <br> password - longquiz</h3>
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button id="login-btn">Login</button>
+        <p id="error" style="display: none;">Invalid credentials, try again.</p>
+    </div>
+
+    <!-- Protected Page -->
+    <div id="protected-page" class="hidden">
+        <h2>Welcome!</h2>
+        <div class="messages" id="messages"></div>
+        <input type="text" id="user-input" placeholder="Enter a string">
+        <button id="submit-btn">Submit</button>
+        <button id="logout-btn">Logout</button>
+    </div>
+
+    <script>
+        const validUsername = "webtech";
+        const validPassword = "longquiz";
+
+        const loginPage = document.getElementById('login-page');
+        const protectedPage = document.getElementById('protected-page');
+        const loginBtn = document.getElementById('login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const error = document.getElementById('error');
+        const userInput = document.getElementById('user-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const messages = document.getElementById('messages');
+
+        if (sessionStorage.getItem('loggedIn')) {
+            showProtectedPage();
+        }
+
+        loginBtn.addEventListener('click', () => {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === validUsername && password === validPassword) {
+                sessionStorage.setItem('loggedIn', 'true');
+                showProtectedPage();
+            } else {
+                error.style.display = 'block';
+            }
+        });
+
+        function showProtectedPage() {
+            loginPage.classList.add('hidden');
+            protectedPage.classList.remove('hidden');
+            loadMessages();
+        }
+
+        logoutBtn.addEventListener('click', () => {
+            sessionStorage.removeItem('loggedIn');
+            loginPage.classList.remove('hidden');
+            protectedPage.classList.add('hidden');
+        });
+
+        submitBtn.addEventListener('click', () => {
+            const input = userInput.value.trim();
+            if (input) {
+                const currentMessages = JSON.parse(localStorage.getItem('messages') || '[]');
+                currentMessages.push(input);
+                localStorage.setItem('messages', JSON.stringify(currentMessages));
+                userInput.value = '';
+                loadMessages();
+            }
+        });
+
+        function loadMessages() {
+            const savedMessages = JSON.parse(localStorage.getItem('messages') || '[]');
+            messages.innerHTML = savedMessages.map(msg => `<p>${msg}</p>`).join('');
+        }
+    </script>
+</body>
+</html>
